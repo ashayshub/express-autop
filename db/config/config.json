@@ -1,0 +1,14 @@
+{
+  "development": {
+    "dialect": "sqlite",
+    "storage": "/tmp/xpress_autop.sqlite"
+  },
+  "test": {
+    "dialect": "sqlite",
+    "storage": "/tmp/xpress_autop.sqlite"
+  },
+  "production": {
+    "dialect": "sqlite",
+    "storage": "/tmp/xpress_autop.sqlite"
+  }
+}

@@ -7,21 +7,21 @@ function printToModal(title, data) {
 
 
 $(document).ready(function() {
+
     
-    $("#populate").click(function(event){
-        
-        event.preventDefault();
+    $("#populate").click(function(){
         var modal_title = "Populate Database";
         $('.modal-title').text(modal_title);
         $('.modal-body p').text('Populating... it may take 10-15 seconds');
         var saveData = $.ajax({
               type: 'POST',
-              url: "/populate/",
+              url: "/populate",
               success: function(resultData){
                    printToModal(modal_title, resultData);
-                   location.href = "/";
+                   //location.href = "/";
               }
         });
+        console.log(saveData);
         saveData.error(function() {
               printToModal(modal_title, 'Error: Something went wrong while populating data');
         });
@@ -34,7 +34,7 @@ $(document).ready(function() {
         $('#modal-close').attr('data-teardown', '1');
         var saveData = $.ajax({
               type: 'DELETE',
-              url: "/teardown/",
+              url: "/teardown",
               success: function(resultData){
                    printToModal(modal_title, resultData);
               }

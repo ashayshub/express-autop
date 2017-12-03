@@ -20,12 +20,13 @@ app.get('/', (req, res) => {
 		'car_type': car_type,
 		'page': 1,
 		'per_page': 10,
-		'cars': [{
-			'car_type': 'Truck',
-			'title': 'Some Car',
-			'summary': 'A good car',
-			'price_query': 'test'
-		}
+		'cars': [
+			{
+				'car_type': 'Truck',
+				'title': 'Some Car',
+				'summary': 'A good car',
+				'price_query': 'test'
+			}
 		]
 	}
 	res.render('main', place_holder)
@@ -33,12 +34,12 @@ app.get('/', (req, res) => {
 
 app.get('/price', (req, res) => {})
 
-
 // All POST Routes
-app.post('/populate', (req, res) => res.render('main'))
-
+app.post('/populate', (req, res) => {
+	res.send('Populated the data into database')
+})
 
 // All delete Routes
-app.get('/teardown', (req, res) => res.render('main'))
+app.get('/teardown', (req, res) => res.send('Tore down the structure'))
 
 app.listen(5000, ()=> console.log('Server started, listening on port 5000'))
