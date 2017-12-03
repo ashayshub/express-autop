@@ -1,0 +1,33 @@
+.bs-example{
+    margin: 20px;
+}
+
+.car-header{
+   text-align: center;
+   color: #999999;
+   font-size: 38.5px;
+   font-family: inherit;
+   line-height: 40px;
+   text-rendering: optimizelegibility;
+    margin-top: 10px;
+    margin-right: 0px;
+    margin-bottom: 10px;
+    margin-left: 0px;
+}
+
+.pagination-page-info {
+    padding: .6em;
+    padding-left: 0;
+    width: 40em;
+    margin: .5em;
+    margin-left: 0;
+    font-size: 12px;
+}
+
+.pagination-page-info b {
+    color: black;
+    background: #6aa6ed;
+    padding-left: 2px;
+    padding: .1em .25em;
+    font-size: 150%;
+}

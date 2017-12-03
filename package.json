@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/ashayshub/express-autop/issues"
   },
-  "homepage": "https://github.com/ashayshub/express-autop#readme"
+  "homepage": "https://github.com/ashayshub/express-autop#readme",
+  "dependencies": {
+    "pug": "^2.0.0-rc.4"
+  }
 }

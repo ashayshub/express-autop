@@ -1,0 +1,65 @@
+doctype html
+html
+	head
+		title #{car_type} - Home | Auto App for Test
+		link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css')
+		link(rel='stylesheet', href='/static/css/autop.css')
+
+	body
+		block scripts
+			script(src='https://code.jquery.com/jquery-3.2.1.min.js')
+			script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js')
+			script(src='/static/js/autop.js')
+
+		block content
+			div.bs-example
+				div.span12
+					div.row
+						div.span2
+							h1.car-header Car type: #{car_type}
+			            
+						div.span10
+							div.text-right       
+								if car_type == "Truck" 
+									a(href="/?car_type=Sport", role="button").btn.btn-link Sports
+								else 
+									a(href="/", role="button").btn.btn-link Home
+
+								button(type="button", data-toggle="modal", data-target="#myModal").btn.btn-primary#populate Populate Database
+								button(type="button", data-toggle="modal").btn.btn-danger#teardown  Teardown Table
+
+				// Modal
+				div(role="dialog").modal.fade#myModal 
+					div.modal-dialog
+						// Modal content
+						div.modal-content
+							div.modal-header
+								button(type="button", data-dismiss="modal").close &times;
+								h4.modal-title
+							div.modal-body
+								p
+							div.modal-footer
+								button(type="button", data-dismiss="modal").btn.btn-default#modal-close Close
+
+
+			// pagination info & links
+			table.table
+				thead
+					tr
+						th #
+						th Type
+						th Title
+						th Summary
+						th Price
+
+				tbody
+				each car, index in cars
+					- id_index = index + (page - 1)* per_page
+					tr
+						td #{index + (page - 1) * per_page}</td>
+						td #{car.car_type}
+						td #{car.title}
+						td #{car.summary}
+						td 
+							button(type="button", data-toggle="modal", data-target="#myModal", data-price-query=car.price_query, id="price-info-"+id_index).btn.btn-info.btn-xs Get Price
+			// pagination.links
