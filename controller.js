@@ -1,5 +1,6 @@
 const db = require('./db/models')
-const Car = require('./db/models').Car;
+const Car = db.Car;
+const paginate = require('express-paginate');
 // const util = require('util')
 
 var getYearwiseUrlList = ($, carType) => {
@@ -63,28 +64,45 @@ var initializeCarList = (url, carType) => {
 module.exports = {
 
 	list_entries: (req, res, car_type) =>{
-		Car.findAll({
-			'order': ['car_type', 'title'],
-			'where': {
-				'car_type': car_type
-			}
-		})
-		.then(data => {
+		return Promise.all([
+			Car.findAll({
+				'offset': req.skip,
+				'limit': req.query.limit,
+				'order': ['car_type', 'title'],
+				'where': {
+					'car_type': car_type
+				}
+			}),
+      		Car.count({
+      			'where': {
+      				'car_type': car_type
+      			}
+      		})
+    	])
+		.then(([results, itemCount]) => {
+			console.log('Got skip: '+ req.skip);
+			var pageCount =  Math.ceil(itemCount / req.query.limit);
 			var response = {
-				'page': 1,
-				'per_page': 10,
+				'cars': results,
+				'offset': req.skip,
+				'pageCount': pageCount,
+				'itemCount': itemCount,
+				'limit':  req.query.limit,
+				pages: paginate.getArrayPages(req)(3, pageCount, req.query.page),
 				'car_type': car_type,
-				'cars': data
 			}
 			res.render('main', response);
 		})
 		.catch(error => {
 			console.log('Error: '+ error);
 			var response = {
-				'page': 1,
-				'per_page': 10,
+				'cars': {},
+				'offset': req.skip,
+				'pageCount': 0,
+				'itemCount': 0,
+				'limit':  req.query.limit,
+				pages: [],
 				'car_type': car_type,
-				'cars': {}
 			}
 			res.status(500).render('main', response)
 		})

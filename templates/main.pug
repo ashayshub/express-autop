@@ -38,8 +38,9 @@ html
 								p
 							div.modal-footer
 								button(type="button", data-dismiss="modal").btn.btn-default#modal-close Close
+			
+			include _paginate
 
-			// pagination info & links
 			table.table
 				thead
 					tr
@@ -51,7 +52,7 @@ html
 
 				tbody
 				each car, index in cars
-					- id_index = 1 + index + (page - 1)* per_page
+					- id_index = 1 + offset + index
 					tr
 						td #{id_index}</td>
 						td #{car.car_type}
@@ -59,7 +60,8 @@ html
 						td #{car.summary}
 						td 
 							button(type="button", data-toggle="modal", data-target="#myModal", data-price-query=car.price_query, id="price-info-"+id_index).btn.btn-info.btn-xs Get Price
-			// pagination.links
+
+			include _paginate
 			
 		block scripts
 			script(src='https://code.jquery.com/jquery-3.2.1.min.js', integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=", crossorigin="anonymous")
