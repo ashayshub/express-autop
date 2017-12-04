@@ -1,5 +1,6 @@
-# A Test webapp on expressjs
+# A Test webapp on expressjs, sequelize, pug, cheerio, request
 
 ### ToDO
-1. TDD (In future projects)
-2. Use config file
+1. Add get price support
+2. Add pagination support
+3. Use config file
