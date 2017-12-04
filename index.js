@@ -45,7 +45,7 @@ app.post('/populate', Controller.populate)
 // All delete Routes
 app.delete('/teardown', Controller.teardown)
 
-app.listen(5000, ()=> {
+app.listen(5000, "0.0.0.0", ()=> {
 	db.sequelize.sync();
 	console.log('Server started, listening on port 5000')
 })

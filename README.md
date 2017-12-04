@@ -5,3 +5,4 @@
 ### ToDO
 1. Add get price support
 2. Use config file
+3. Add some throttle/sleep to r.get calls

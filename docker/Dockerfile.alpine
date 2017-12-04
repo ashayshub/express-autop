@@ -1,0 +1,10 @@
+FROM node:8.9.1-alpine
+RUN apk update --no-cache
+RUN apk add git
+#RUN git clone https://github.com/ashayshub/flask-autop.git /app
+COPY . /app
+WORKDIR /app
+RUN npm install
+ENV DEBUG 1
+ENTRYPOINT ["node"]
+CMD ["./index.js"]
