@@ -1,3 +1,4 @@
+const db = require('./db/models')
 const Car = require('./db/models').Car;
 // const util = require('util')
 
@@ -79,7 +80,13 @@ module.exports = {
 		})
 		.catch(error => {
 			console.log('Error: '+ error);
-			res.status(500).render('main', {})
+			var response = {
+				'page': 1,
+				'per_page': 10,
+				'car_type': car_type,
+				'cars': {}
+			}
+			res.status(500).render('main', response)
 		})
 	},
 
@@ -117,17 +124,33 @@ module.exports = {
 					carList.push.apply(carList, info2[index3]['car_list']);
 				});
 
-				console.log('Length: '+ Object.keys(carList).length);
+				// Create table if not already
+				db.sequelize.sync();
+
 				return Car.bulkCreate(carList, {individualHooks: true});
 
 			})
 			.then(resp =>{
 				// console.log(resp);
-				res.status(201).send('Populated');
+				res.status(201).send('Populated the data into database');
 			})
 			.catch(error => {
 				console.log(error);
 				res.status(500).send('Error while populating data');
 			});
-			}
+	},
+
+	teardown: (req, res) => {
+		return Car.drop()
+				.then( status => {
+
+					// Create the table after teardown
+					db.sequelize.sync();
+
+					res.send('Tore down the structure');
+				})
+				.catch(error => {
+					res.status(500).send('Error dropping table');
+				});
+	}
 };

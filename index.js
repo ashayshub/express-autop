@@ -28,7 +28,7 @@ app.get('/price', (req, res) => {})
 app.post('/populate', Controller.populate)
 
 // All delete Routes
-app.delete('/teardown', (req, res) => res.send('Tore down the structure'))
+app.delete('/teardown', Controller.teardown)
 
 app.listen(5000, ()=> {
 	db.sequelize.sync();

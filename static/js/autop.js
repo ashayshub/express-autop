@@ -19,7 +19,7 @@ $(document).ready(function() {
         })
         .done(function(resultData){
                    printToModal(modal_title, resultData);
-                   //location.href = "/";
+                   location.href = "/";
         })
         .fail(function() {
               printToModal(modal_title, 'Error: Something went wrong while populating data');
