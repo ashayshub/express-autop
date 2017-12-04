@@ -1,19 +1,23 @@
 const Car = require('./db/models').Car;
+// const util = require('util')
 
-
-var getYearwiseUrlList = ($) => {
+var getYearwiseUrlList = ($, carType) => {
 	var urlList = [];
 	var curr_year = (new Date()).getFullYear().toString();
 	$('ul[class="dropdown-menu"]').find('a').each((index, element) => {
 		if (curr_year == $(element).attr('href'))
 			return;
-		urlList.push($(element).attr('href'));
+		urlList.push({
+			'uri': $(element).attr('href'),
+			'carType': carType
+		});
 	});
 	return urlList;
 };
 
 var format_list = ($, carType) => {
 	carList = []
+
 	$('div[class="rtww"]').find('a').each((index, element) => {
 		var title = $(element).find('h3').text();
 		var carInfo = title.split(" ");
@@ -33,7 +37,7 @@ var format_list = ($, carType) => {
 							'-' + 'year' + '-' + $(element).attr('data-l-cid')
 		});
 	});
-	return {'car_list': carList, 'year_list': getYearwiseUrlList($), 'car_type': carType};
+	return {'car_list': carList, 'year_list': getYearwiseUrlList($, carType)};
 };
 
 
@@ -41,13 +45,13 @@ var initializeCarList = (url, carType) => {
 	return new Promise ((resolve, reject) => {
 		const urlPrefix = 'http://www.nydailynews.com';
 		var cheerio = require('cheerio');
-		console.log('URL: '+ url);
 	  	r = require('request');
-	  	r.get(url, {}, (err, res, body) =>{
+	  	r.get({uri: url, gzip: true}, (err, res, body) =>{
 	  		if (err) {
 	  			console.log('Some Error: ' + err);
 	  			return reject(err);
 	  		}
+	  		console.log('URL: '+ url);
 			$ = cheerio.load(body);
 			return resolve(format_list($, carType));
 	  	});
@@ -59,7 +63,10 @@ module.exports = {
 
 	list_entries: (req, res, car_type) =>{
 		Car.findAll({
-			'order': ['car_type', 'title']
+			'order': ['car_type', 'title'],
+			'where': {
+				'car_type': car_type
+			}
 		})
 		.then(data => {
 			var response = {
@@ -78,8 +85,8 @@ module.exports = {
 
 	populate: (req, res) => {
 		const urlList = {
-		'Truck': 'http://www.nydailynews.com/autos/types/truck',
-		'Sport': 'http://www.nydailynews.com/autos/types/sports-car'
+			'Truck': 'http://www.nydailynews.com/autos/types/truck',
+			'Sport': 'http://www.nydailynews.com/autos/types/sports-car'
 		};
 
 		var carList = [];
@@ -91,32 +98,36 @@ module.exports = {
 			.then(info => {
 			  	const urlPrefix = 'http://www.nydailynews.com';
 			  	var year_list = []
-			  	var car_type = '';
+
 				Object.keys(info).map(index => {			
 					carList.push.apply(carList, info[index]['car_list']);
 					year_list.push.apply(year_list, info[index]['year_list']);
-					car_type = info[index]['car_type'];
 				});
-
+					
 				var innerCarListProms = Object.keys(year_list).map(index2 =>{
-					return initializeCarList(urlPrefix + year_list[index2], car_type);
+					var url = urlPrefix + year_list[index2].uri;
+					var car_type = year_list[index2].carType;
+					return initializeCarList(url, car_type);
 				});
-				return Promise.all(innerCarListProms)
+				return Promise.all(innerCarListProms);
 
-			}).then(info2 => {
+			})
+			.then(info2 => {
 						Object.keys(info2).map(index3 =>{
 							carList.push.apply(carList, info2[index3]['car_list']);
 						});
 
 						console.log('Length: '+ Object.keys(carList).length);
-						return Car.bulkCreate(carList, {individualHooks: true})
+						return Car.bulkCreate(carList, {individualHooks: true});
 
-			}).then(status =>{
+			})
+			.then(resp =>{
+				// console.log(resp);
 				res.status(201).send('Populated');
 			})
 			.catch(error => {
 				console.log(error);
-				res.status(500).send('Error quering information from remote source');
+				res.status(500).send('Error while populating data');
 			});
 			}
 };
