@@ -32,7 +32,7 @@ app.get('/', (req, res, next) => {
 app.get('/price', (req, res) => {
 	const query = req.query.price_query || undefined;
 	if (!query)
-        return res.status(400).status('Bad Request');
+    	return res.status(400).status('Bad Request');
 
     var url_prefix = 'http://www.nydailynews.com/autos/';
     var price_url = url_prefix + query;
