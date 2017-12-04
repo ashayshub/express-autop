@@ -7,6 +7,9 @@ app.use('/static', express.static('static'))
 app.set('view engine', 'pug')
 app.set('views', './templates')
 
+const Controller = require('./controller');
+var db = require('./db/models');
+
 // All GET Routes
 app.get('/', (req, res) => {
 	var car_type = req.query.car_type || 'Truck'	
@@ -16,30 +19,18 @@ app.get('/', (req, res) => {
 		res.status(400).send('Bad Request')
 		return
 	}
-	var place_holder = {
-		'car_type': car_type,
-		'page': 1,
-		'per_page': 10,
-		'cars': [
-			{
-				'car_type': 'Truck',
-				'title': 'Some Car',
-				'summary': 'A good car',
-				'price_query': 'test'
-			}
-		]
-	}
-	res.render('main', place_holder)
+	var place_holder = Controller.list_entries(req, res, car_type);
 })
 
 app.get('/price', (req, res) => {})
 
 // All POST Routes
-app.post('/populate', (req, res) => {
-	res.send('Populated the data into database')
-})
+app.post('/populate', Controller.populate)
 
 // All delete Routes
 app.get('/teardown', (req, res) => res.send('Tore down the structure'))
 
-app.listen(5000, ()=> console.log('Server started, listening on port 5000'))
+app.listen(5000, ()=> {
+	db.sequelize.sync();
+	console.log('Server started, listening on port 5000')
+})
