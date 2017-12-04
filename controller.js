@@ -113,12 +113,12 @@ module.exports = {
 
 			})
 			.then(info2 => {
-						Object.keys(info2).map(index3 =>{
-							carList.push.apply(carList, info2[index3]['car_list']);
-						});
+				Object.keys(info2).map(index3 =>{
+					carList.push.apply(carList, info2[index3]['car_list']);
+				});
 
-						console.log('Length: '+ Object.keys(carList).length);
-						return Car.bulkCreate(carList, {individualHooks: true});
+				console.log('Length: '+ Object.keys(carList).length);
+				return Car.bulkCreate(carList, {individualHooks: true});
 
 			})
 			.then(resp =>{
