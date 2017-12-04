@@ -1,4 +1,5 @@
 'use strict';
+
 const express = require('express')
 const paginate = require('express-paginate');
 
@@ -22,14 +23,21 @@ app.get('/', (req, res, next) => {
 			res.status(400).send('Bad Request')
 			return
 		}
-		var place_holder = Controller.list_entries(req, res, car_type);
+		Controller.list_entries(req, res, car_type, paginate);
 	} catch (err){
 		next(err);
 	}
-
 })
 
-app.get('/price', (req, res) => {})
+app.get('/price', (req, res) => {
+	const query = req.query.price_query || undefined;
+	if (!query)
+        return res.status(400).status('Bad Request');
+
+    var url_prefix = 'http://www.nydailynews.com/autos/';
+    var price_url = url_prefix + query;
+    Controller.request_price(req, res, price_url);
+})
 
 // All POST Routes
 app.post('/populate', Controller.populate)

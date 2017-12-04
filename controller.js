@@ -1,6 +1,8 @@
-const db = require('./db/models')
+const db = require('./db/models');
 const Car = db.Car;
-const paginate = require('express-paginate');
+const cheerio = require('cheerio');
+const r = require('request');
+
 // const util = require('util')
 
 var getYearwiseUrlList = ($, carType) => {
@@ -46,8 +48,6 @@ var format_list = ($, carType) => {
 var initializeCarList = (url, carType) => {
 	return new Promise ((resolve, reject) => {
 		const urlPrefix = 'http://www.nydailynews.com';
-		var cheerio = require('cheerio');
-	  	r = require('request');
 	  	r.get({uri: url, gzip: true}, (err, res, body) =>{
 	  		if (err) {
 	  			console.log('Some Error: ' + err);
@@ -60,10 +60,40 @@ var initializeCarList = (url, carType) => {
 	});
 };
 
+var getTrimId = (url) => {
+	return new Promise ((resolve, reject) => {
+	  	r.get({uri: url, gzip: true}, (err, res, body) =>{
+	  		if (err) {
+	  			console.log('Some Error: ' + err);
+	  			return reject(err);
+	  		}
+			$ = cheerio.load(body);
+			return resolve($('div[id="ra-wrap"]').attr('data-trimid'));
+	  	});
+	});
+};
+
+var getPrice = trimId => {
+	return new Promise ((resolve, reject) => {
+    	const apiEndpoint = 'http://api.edmunds.com/api/vehicle/v2/styles/';
+    	const partUri = '?view=full&fmt=json&api_key=';
+    	const apiKey = 'b72ndgbvxw4vp92eugantyr4';
+		const url = apiEndpoint + trimId + partUri + apiKey;
+
+	  	r.get({uri: url, gzip: true}, (err, res, body) =>{
+	  		if (err) {
+	  			console.log('Some Error: ' + err);
+	  			return reject(err);
+	  		}
+			return resolve(JSON.parse(body));
+	  	});
+	});
+};
+
 
 module.exports = {
 
-	list_entries: (req, res, car_type) =>{
+	list_entries: (req, res, car_type, p) =>{
 		return Promise.all([
 			Car.findAll({
 				'offset': req.skip,
@@ -80,7 +110,7 @@ module.exports = {
       		})
     	])
 		.then(([results, itemCount]) => {
-			console.log('Got skip: '+ req.skip);
+			// console.log('Got skip: '+ req.skip);
 			var pageCount =  Math.ceil(itemCount / req.query.limit);
 			var response = {
 				'cars': results,
@@ -88,7 +118,7 @@ module.exports = {
 				'pageCount': pageCount,
 				'itemCount': itemCount,
 				'limit':  req.query.limit,
-				pages: paginate.getArrayPages(req)(3, pageCount, req.query.page),
+				'pages': p.getArrayPages(req)(3, pageCount, req.query.page),
 				'car_type': car_type,
 			}
 			res.render('main', response);
@@ -101,11 +131,27 @@ module.exports = {
 				'pageCount': 0,
 				'itemCount': 0,
 				'limit':  req.query.limit,
-				pages: [],
+				'pages': [],
 				'car_type': car_type,
 			}
 			res.status(500).render('main', response)
 		})
+	},
+
+	request_price: (req, res, url) =>{
+		return getTrimId(url)
+				.then(trimId =>{
+					// console.log('Got TrimID: '+ trimId);
+					return getPrice(trimId);
+				})
+				.then(priceObj =>{
+					// console.log('Got Price' + priceObj.price.baseMSRP);
+					res.json(priceObj.price);
+				})
+				.catch(error =>{
+					console.log('Error while querying the price: '+ error);
+					res.status(500).send('Internal server error');
+				})
 	},
 
 	populate: (req, res) => {
