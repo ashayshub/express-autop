@@ -3,6 +3,5 @@
 ### is based on expressjs, sequelize, pug, cheerio, request, express-paginate
 
 ### ToDO
-1. Add get price support
-2. Use config file
-3. Add some throttle/sleep to r.get calls
+1. Use config file
+2. Add some throttle/sleep to r.get calls
