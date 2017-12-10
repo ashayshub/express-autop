@@ -1,4 +1,8 @@
+/*jslint node: true */
+/*jshint esversion: 6 */
+
 'use strict';
+
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Car', {

@@ -1,4 +1,8 @@
+/*jslint node: true */
+/*jshint esversion: 6 */
+
 'use strict';
+
 module.exports = (sequelize, DataTypes) => {
   var Car = sequelize.define('Car', {
     title: DataTypes.STRING(120),

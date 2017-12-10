@@ -1,3 +1,7 @@
+/*jslint node: true */
+/*jshint esversion: 6 */
+'use strict';
+
 const db = require('./db/models');
 const Car = db.Car;
 const cheerio = require('cheerio');
@@ -20,7 +24,7 @@ var getYearwiseUrlList = ($, carType) => {
 };
 
 var format_list = ($, carType) => {
-	carList = []
+	var carList = [];
 
 	$('div[class="rtww"]').find('a').each((index, element) => {
 		var title = $(element).find('h3').text();
@@ -54,7 +58,7 @@ var initializeCarList = (url, carType) => {
 	  			return reject(err);
 	  		}
 	  		console.log('URL: '+ url);
-			$ = cheerio.load(body);
+			var $ = cheerio.load(body);
 			return resolve(format_list($, carType));
 	  	});
 	});
@@ -67,7 +71,7 @@ var getTrimId = (url) => {
 	  			console.log('Some Error: ' + err);
 	  			return reject(err);
 	  		}
-			$ = cheerio.load(body);
+			var $ = cheerio.load(body);
 			return resolve($('div[id="ra-wrap"]').attr('data-trimid'));
 	  	});
 	});
@@ -120,7 +124,7 @@ module.exports = {
 				'limit':  req.query.limit,
 				'pages': p.getArrayPages(req)(3, pageCount, req.query.page),
 				'car_type': car_type,
-			}
+			};
 			res.render('main', response);
 		})
 		.catch(error => {
@@ -133,9 +137,9 @@ module.exports = {
 				'limit':  req.query.limit,
 				'pages': [],
 				'car_type': car_type,
-			}
-			res.status(500).render('main', response)
-		})
+			};
+			res.status(500).render('main', response);
+		});
 	},
 
 	request_price: (req, res, url) =>{
@@ -151,7 +155,7 @@ module.exports = {
 				.catch(error =>{
 					console.log('Error while querying the price: '+ error);
 					res.status(500).send('Internal server error');
-				})
+				});
 	},
 
 	populate: (req, res) => {
@@ -168,11 +172,11 @@ module.exports = {
 		return Promise.all(carListProms)
 			.then(info => {
 			  	const urlPrefix = 'http://www.nydailynews.com';
-			  	var year_list = []
+			  	var year_list = [];
 
 				Object.keys(info).map(index => {			
-					carList.push.apply(carList, info[index]['car_list']);
-					year_list.push.apply(year_list, info[index]['year_list']);
+					carList.push.apply(carList, info[index].car_list);
+					year_list.push.apply(year_list, info[index].year_list);
 				});
 					
 				var innerCarListProms = Object.keys(year_list).map(index2 =>{
@@ -185,7 +189,7 @@ module.exports = {
 			})
 			.then(info2 => {
 				Object.keys(info2).map(index3 =>{
-					carList.push.apply(carList, info2[index3]['car_list']);
+					carList.push.apply(carList, info2[index3].car_list);
 				});
 
 				// Create table if not already
